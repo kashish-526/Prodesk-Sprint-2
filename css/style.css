@@ -2368,7 +2368,64 @@ body.menu-open {
 
 
 
+/* Live Market Rates section */
+.rates {
+    padding: 5rem 0;
+}
 
+/* cards ka grid layout */
+.rates__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+/* ek card */
+.rate-card {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+/* currency name - jaise INR, EUR */
+.rate-card__currency {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--clr-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* rate number */
+.rate-card__rate {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--clr-text);
+    margin-bottom: 0.25rem;
+}
+
+/* "per 1 USD" text */
+.rate-card__label {
+    font-size: 0.8rem;
+    color: var(--clr-text-muted);
+}
+
+/* error box styling */
+.rates__error {
+    text-align: center;
+    padding: 2rem;
+    color: red;
+    font-weight: 600;
+}
+
+/* mobile pe 2 column */
+@media (max-width: 768px) {
+    .rates__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
 /* ================================================================
    FAQ SECTION — Sprint 2 Phase 1
