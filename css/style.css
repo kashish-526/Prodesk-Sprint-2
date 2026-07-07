@@ -2427,6 +2427,49 @@ body.menu-open {
     }
 }
 
+
+
+/* skeleton loader animation */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* skeleton card */
+.rate-card--skeleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+/* grey animated box */
+.skeleton-box {
+    border-radius: 6px;
+    background: linear-gradient(
+        90deg,
+        var(--clr-surface-2) 25%,
+        var(--clr-surface-3) 50%,
+        var(--clr-surface-2) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* size variants */
+.skeleton-box--sm {
+    width: 60%;
+    height: 1rem;
+}
+
+.skeleton-box--lg {
+    width: 80%;
+    height: 2rem;
+}
+
+
+
 /* ================================================================
    FAQ SECTION — Sprint 2 Phase 1
    ================================================================ */
