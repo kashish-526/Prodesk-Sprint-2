@@ -1,15 +1,11 @@
-
-
-
-// ye 8 currencies show karni hain
+// currencies list
 const SHOW_CURRENCIES = ['INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'SGD', 'AED']
 
-// API ka address
+
 const API_URL = 'https://open.er-api.com/v6/latest/USD'
 
-// skeleton cards banane ka function
+// skeleton dikhane ka function
 function showSkeleton(grid) {
-    // 8 currency hain to 8 skeleton cards 
     for (let i = 0; i < 8; i++) {
         let skeleton = document.createElement('div')
         skeleton.className = 'rate-card rate-card--skeleton'
@@ -22,69 +18,79 @@ function showSkeleton(grid) {
     }
 }
 
-// rates fetch karne ka main function
+// cards banane ka function
+function showCards(grid, ratesArray) {
+    grid.innerHTML = ''
+    ratesArray.forEach(function(item) {
+        let card = document.createElement('div')
+        card.className = 'rate-card'
+        card.innerHTML = `
+            <div class="rate-card__currency">${item.name}</div>
+            <div class="rate-card__rate">${item.rate.toFixed(2)}</div>
+            <div class="rate-card__label">per 1 USD</div>
+        `
+        grid.appendChild(card)
+    })
+}
+
+// main function h
 async function getRates() {
 
-    // HTML elements pakdo
     let grid = document.getElementById('rates-grid')
     let errorBox = document.getElementById('rates-error')
 
-    // pehle skeleton dikhao
+    // skeleton pehle show
     showSkeleton(grid)
 
-    // AbortController — 5 sec ka timeout
+    // timeout ke liye AbortController
     let controller = new AbortController()
     let timer = setTimeout(function() {
         controller.abort()
     }, 5000)
 
     try {
-        // fetch karo — controller signal bhi do
+        // API se data fetch kiye
         let response = await fetch(API_URL, {
             signal: controller.signal
         })
 
-        // timer band karo kyunki data aa gaya
         clearTimeout(timer)
 
-        // response theek nahi aaya
         if (!response.ok) {
             throw new Error('response theek nahi aaya')
         }
 
-        // JSON mein convert 
         let data = await response.json()
 
-        // skeleton hatao
-        grid.innerHTML = ''
+        // Web Worker 
+        let worker = new Worker('js/worker.js')
 
-        // real cards banao
-        SHOW_CURRENCIES.forEach(function(currency) {
+        // worker ko raw rates data bheje
+        worker.postMessage(data.rates)
 
-            let rate = data.rates[currency]
+        // worker se processed data aane par
+        worker.onmessage = function(event) {
+            // cards 
+            showCards(grid, event.data)
 
-            let card = document.createElement('div')
-            card.className = 'rate-card'
+            // worker ka kaam khatam 
+            worker.terminate()
+        }
 
-            card.innerHTML = `
-                <div class="rate-card__currency">${currency}</div>
-                <div class="rate-card__rate">${rate.toFixed(2)}</div>
-                <div class="rate-card__label">per 1 USD</div>
-            `
-
-            grid.appendChild(card)
-        })
+        // worker mein error aaye toh
+        worker.onerror = function(err) {
+            console.log('worker error:', err)
+            worker.terminate()
+        }
 
     } catch (error) {
 
-        // skeleton hatao
         grid.innerHTML = ''
 
-        // timeout hua ya kuch aur
         if (error.name === 'AbortError') {
-            errorBox.innerHTML = '<p>Request timeout — server ne 5 sec mein jawab nahi diya</p>'
+            errorBox.innerHTML = '<p>⚠️ Request timeout — 5 sec mein jawab nahi aaya</p>'
         } else {
-            errorBox.innerHTML = '<p> Service Unavailable. Please try again later.</p>'
+            errorBox.innerHTML = '<p>⚠️ Service Unavailable. Please try again later.</p>'
         }
 
         errorBox.removeAttribute('hidden')
@@ -92,5 +98,4 @@ async function getRates() {
     }
 }
 
-// page load hone par
 getRates()
